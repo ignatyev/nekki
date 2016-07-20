@@ -1,8 +1,10 @@
 package ru.nekki.test.xml;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import ru.nekki.test.dao.Entity;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
@@ -11,46 +13,60 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 /**
  * <Entry>
  * <!--строка длиной до 1024 символов-->
  * <content>Содержимое записи</content>
  * <!--дата создания записи-->
- * <creationDate>2014-01-01 00:00:00</date>
+ * <creationDate>2014-01-01 00:00:00</creationDate>
  * </Entry>
  * <p/>
  * Created by AnVIgnatev on 20.07.2016.
  */
 public class XMLParser {
-    public static void parse(Path file) throws ParserConfigurationException, SAXException, IOException {
+
+    public static final String CONTENT = "content";
+    public static final String CREATION_DATE = "creationDate";
+
+    public static Entity parse(Path file) throws ParserConfigurationException, IOException, SAXException {
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(file.toFile());
 
-        doc.getDocumentElement().normalize();
+        String content = getString(doc.getElementsByTagName(CONTENT));
+        String creationDate = getString(doc.getElementsByTagName(CREATION_DATE));
 
-        NodeList nList = doc.getElementsByTagName("staff");
+        Entity entity = new Entity();
+        entity.setContent(content);
+        entity.setCreationDate(parseDate(creationDate));
+        return entity;
+    }
 
-        System.out.println();
+    private static Date parseDate(String date) {
+        if (date == null) return null;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        try {
+            return simpleDateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-       /* DocumentBuilder newDocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document parse = newDocumentBuilder.parse(file.toFile());
-        System.out.println(parse.getFirstChild().getTextContent());
-
-*/
-        /*
-        JAXBContext jc = JAXBContext.newInstance(Entry.class);
-        Unmarshaller unmarshaller = jc.createUnmarshaller();
-        try (BufferedReader reader = Files.newBufferedReader(file, Charset.defaultCharset())) {
-            Object je = unmarshaller.unmarshal(
-                    reader);
-            System.out.println(je);
-        }*/
+    private static String getString(NodeList nodes) {
+        if (nodes == null || nodes.getLength() != 1) return null;
+        Node item = nodes.item(0);
+        if (item == null) return null;
+        return item.getTextContent();
     }
 
     public static void main(String[] args) throws JAXBException, IOException, ParserConfigurationException, SAXException {
-        parse(Paths.get("c:/test/1.xml"));
+        parse(Paths.get("c:/temp/1.xml"));
     }
 }

@@ -1,0 +1,39 @@
+package ru.nekki.test.dao;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+
+public class DAOService {
+
+    private static SessionFactory sessionFactory;
+
+    static {
+        setUp();
+    }
+
+    private static void setUp() {
+        // A SessionFactory is set up once for an application!
+        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+                .configure() // configures settings from hibernate.cfg.xml
+                .build();
+        try {
+            sessionFactory =
+                    new MetadataSources(registry).buildMetadata().buildSessionFactory();
+        } catch (Exception e) {
+            // The registry would be destroyed by the SessionFactory, but we had trouble building the SessionFactory
+            // so destroy it manually.
+            StandardServiceRegistryBuilder.destroy(registry);
+        }
+    }
+
+    public static void persist(Entity entity) {
+        if (entity == null) return;
+        Session session = sessionFactory.openSession();
+        session.save(entity);
+        session.flush();
+        session.close();
+    }
+}

@@ -1,6 +1,8 @@
 package ru.nekki.test;
 
 import org.xml.sax.SAXException;
+import ru.nekki.test.dao.DAOService;
+import ru.nekki.test.dao.Entity;
 import ru.nekki.test.xml.XMLParser;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,8 +16,9 @@ public class Processor {
 
     public static void process(Path file) {
         //read file
+        Entity entity = null;
         try {
-            XMLParser.parse(file);
+            entity = XMLParser.parse(file);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParserConfigurationException e) {
@@ -24,7 +27,7 @@ public class Processor {
             e.printStackTrace();
         }
         //save file
-
+        DAOService.persist(entity);
         //delete file
 
     }

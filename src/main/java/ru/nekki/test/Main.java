@@ -16,8 +16,8 @@ public class Main {
 
     public static void main(String[] args) {
 //TODO check input
-        final Path dir = Paths.get("c:/test"); //TODO move to params
-        if (Files.notExists(dir) || !Files.isDirectory(dir) || Files.isReadable(dir)) {
+        final Path dir = Paths.get("c:/temp"); //TODO move to params
+        if (Files.notExists(dir) || !Files.isDirectory(dir) || !Files.isReadable(dir)) {
             //TODO cycle here?
             throw new RuntimeException(
                     String.format("The folder %s does not exist, is not a directory or is forbidden to be read", dir));
