@@ -29,10 +29,10 @@ public class DAOService {
         }
     }
 
-    public static void persist(Entity entity) {
-        if (entity == null) return;
+    public static void persist(Entry entry) {
+        if (entry == null) return;
         Session session = sessionFactory.openSession();
-        session.save(entity);
+        session.save(entry);
         session.flush();
         session.close();
     }

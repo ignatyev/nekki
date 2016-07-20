@@ -4,7 +4,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import ru.nekki.test.dao.Entity;
+import ru.nekki.test.dao.Entry;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
@@ -32,20 +32,24 @@ public class XMLParser {
 
     public static final String CONTENT = "content";
     public static final String CREATION_DATE = "creationDate";
+    public static final String ENTRY = "Entry";
 
-    public static Entity parse(Path file) throws ParserConfigurationException, IOException, SAXException {
+    public static Entry parse(Path file) throws ParserConfigurationException, IOException, SAXException {
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(file.toFile());
 
+        //wrong file xml structure
+        if (!ENTRY.equals(doc.getDocumentElement().getTagName())) return null;
+
         String content = getString(doc.getElementsByTagName(CONTENT));
         String creationDate = getString(doc.getElementsByTagName(CREATION_DATE));
 
-        Entity entity = new Entity();
-        entity.setContent(content);
-        entity.setCreationDate(parseDate(creationDate));
-        return entity;
+        Entry entry = new Entry();
+        entry.setContent(content);
+        entry.setCreationDate(parseDate(creationDate));
+        return entry;
     }
 
     private static Date parseDate(String date) {

@@ -16,7 +16,7 @@
 
         <property name="show_sql">true</property>
 
-        <mapping file="Entity.hbm.xml"/>
+        <mapping resource="ru.nekki.test.dao/Entry.hbm.xml"/>
 
     </session-factory>
 </hibernate-configuration>

@@ -6,8 +6,8 @@ import javax.persistence.Table;
 import java.util.Date;
 
 @javax.persistence.Entity
-@Table(name = "ENTITY")
-public class Entity {
+@Table(name = "ENTRY")
+public class Entry {
     private String content;
     private Date creationDate;
     private int id;

@@ -4,7 +4,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="ru.nekki.test.dao.Entity" table="ENTITY">
+    <class name="ru.nekki.test.dao.Entry" table="ENTRY">
         <id name="id" type="int" column="ID">
             <generator class="native"/>
         </id>
