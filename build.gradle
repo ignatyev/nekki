@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     compile group: 'org.hibernate', name: 'hibernate-core', version: '5.1.0.Final'
+    compile group: 'org.hibernate', name: 'hibernate-c3p0', version: '4.1.0.Final'
     compile group: 'postgresql', name: 'postgresql', version: '9.1-901.jdbc4'
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.6.2'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.6.2'
