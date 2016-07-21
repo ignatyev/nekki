@@ -5,9 +5,12 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 /**
@@ -15,15 +18,28 @@ import java.util.concurrent.Executors;
  */
 public class Main {
     private final static Logger logger = LogManager.getLogger(Main.class);
+    public static final String CONFIG_PROPERTIES = "config.properties";
+    public static final String INPUT_PROPERTY = "input";
+    public static final String OUTPUT_PROPERTY = "output";
 
     public static void main(String[] args) {
-//TODO check input
-        //TODO move to params
-        Path inputDir = Paths.get("C:\\Users\\AnVIgnatev\\Documents\\TEMP");
-        Path processedDir = Paths.get("C:\\Users\\AnVIgnatev\\Documents\\TEMP\\processed");
+        Properties properties = loadProperties();
+        Path inputDir = Paths.get(properties.getProperty(INPUT_PROPERTY));
+        Path processedDir = Paths.get(properties.getProperty(OUTPUT_PROPERTY));
         checkFolders(inputDir, processedDir);
         processNewFiles(inputDir, processedDir);
         processInitialFiles(inputDir, processedDir);
+    }
+
+    private static Properties loadProperties() {
+        Properties properties = new Properties();
+        try (InputStream resourceAsStream = Main.class.getClassLoader().getResourceAsStream(CONFIG_PROPERTIES)) {
+            properties.load(resourceAsStream);
+        } catch (IOException e) {
+            logger.error("Could not read property file " + CONFIG_PROPERTIES);
+            throw new RuntimeException();
+        }
+        return properties;
     }
 
     private static void checkFolders(Path... dirs) {
