@@ -1,27 +1,23 @@
 package ru.nekki.test;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.nio.file.*;
 
-import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 /**
  * Created by AnVIgnatev on 20.07.2016.
  */
 public class FileSystemUtil {
+    private final static Logger logger =
+            LogManager.getLogger(FileSystemUtil.class);
 
-    public static void processNewFiles(final Path dir) {
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        waitForNewFilesAndProcess(dir);
-                    }
-                }
-        ).start();
 
-    }
-    private static void waitForNewFilesAndProcess(Path dir) {
+    public static void waitForNewFilesAndProcess(Path dir, Path processedFolder) {
         WatchService watcher = registerWatcher(dir);
         for (; ; ) {
             WatchKey key;
@@ -42,24 +38,15 @@ public class FileSystemUtil {
                 if (kind == OVERFLOW) {
                     continue;
                 }
+                if (kind == ENTRY_CREATE) {
+                    // The filename is the
+                    // context of the event.
+                    WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                    Path filename = ev.context();
 
-                // The filename is the
-                // context of the event.
-                WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                Path filename = ev.context();
-
-                // Verify that the new
-                //  file is a text file.
-                // Resolve the filename against the directory.
-                // If the filename is "test" and the directory is "foo",
-                // the resolved name is "test/foo".
-                Path child = dir.resolve(filename);
-                Processor.process(child);
-
-                // Email the file to the
-                //  specified email alias.
-                System.out.format("Emailing file %s%n", filename);
-                //Details left to reader....
+                    Path child = dir.resolve(filename);
+                    FileProcessor.process(child, processedFolder);
+                }
             }
 
             // Reset the key -- this step is critical if you want to
@@ -77,10 +64,11 @@ public class FileSystemUtil {
         WatchService watcher;
         try {
             watcher = FileSystems.getDefault().newWatchService();
-            dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY); //TODO use result??
+            dir.register(watcher, ENTRY_CREATE);
             return watcher;
         } catch (IOException x) {
-            //TODO log
+            logger.error(
+                    String.format("Could not register watcher for folder %s. Is the folder available?", dir));
             throw new RuntimeException(x); //TODO wait until folder exists
         }
     }

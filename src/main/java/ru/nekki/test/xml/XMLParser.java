@@ -1,18 +1,18 @@
 package ru.nekki.test.xml;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import ru.nekki.test.dao.Entry;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,10 +29,13 @@ import java.util.Date;
  * Created by AnVIgnatev on 20.07.2016.
  */
 public class XMLParser {
-
     public static final String CONTENT = "content";
     public static final String CREATION_DATE = "creationDate";
     public static final String ENTRY = "Entry";
+    public static final String DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
+    public static final int MAX_CONTENT_LENGTH = 1024;
+    private final static Logger logger =
+            LogManager.getLogger(XMLParser.class);
 
     public static Entry parse(Path file) throws ParserConfigurationException, IOException, SAXException {
 
@@ -40,8 +43,10 @@ public class XMLParser {
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(file.toFile());
 
-        //wrong file xml structure
-        if (!ENTRY.equals(doc.getDocumentElement().getTagName())) return null;
+        if (!ENTRY.equals(doc.getDocumentElement().getTagName())) {
+            logger.info(file + " has wrong xml structure");
+            return null;
+        }
 
         String content = getString(doc.getElementsByTagName(CONTENT));
         String creationDate = getString(doc.getElementsByTagName(CREATION_DATE));
@@ -54,11 +59,13 @@ public class XMLParser {
 
     private static Date parseDate(String date) {
         if (date == null) return null;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT);
         try {
             return simpleDateFormat.parse(date);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(
+                    String.format("Wrong date format (%s is expected): %s",
+                            DATE_FORMAT, date), e);
         }
         return null;
     }
@@ -67,10 +74,10 @@ public class XMLParser {
         if (nodes == null || nodes.getLength() != 1) return null;
         Node item = nodes.item(0);
         if (item == null) return null;
-        return item.getTextContent();
-    }
-
-    public static void main(String[] args) throws JAXBException, IOException, ParserConfigurationException, SAXException {
-        parse(Paths.get("c:/temp/1.xml"));
+        String textContent = item.getTextContent();
+        if (textContent != null && textContent.length() > MAX_CONTENT_LENGTH) {
+            return textContent.substring(0, MAX_CONTENT_LENGTH - 1);
+        }
+        return textContent;
     }
 }
