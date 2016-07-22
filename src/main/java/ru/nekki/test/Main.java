@@ -23,6 +23,7 @@ public class Main {
     public static final String OUTPUT_PROPERTY = "output";
 
     public static void main(String[] args) {
+        logger.debug("=================================START=================================");
         Properties properties = loadProperties();
         Path inputDir = Paths.get(properties.getProperty(INPUT_PROPERTY));
         Path processedDir = Paths.get(properties.getProperty(OUTPUT_PROPERTY));

@@ -32,7 +32,7 @@ public class FileProcessor {
         Entry entry = null;
         try {
             entry = XMLParser.parse(file);
-            logger.info(file + " is successfully parsed.");
+            logger.info(file + " has been successfully parsed.");
         } catch (IOException | ParserConfigurationException e) {
             logger.error("Error while parsing " + file, e);
         } catch (SAXException e) {
