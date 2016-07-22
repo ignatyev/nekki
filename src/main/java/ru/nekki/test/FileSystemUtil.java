@@ -17,8 +17,8 @@ public class FileSystemUtil {
             LogManager.getLogger(FileSystemUtil.class);
 
 
-    public static void waitForNewFilesAndProcess(Path dir, Path processedFolder) {
-        WatchService watcher = registerWatcher(dir);
+    public static void waitForNewFilesAndProcess(Path inputDir, Path outputDir) {
+        WatchService watcher = registerWatcher(inputDir);
         for (; ; ) {
             WatchKey key;
             try {
@@ -44,8 +44,9 @@ public class FileSystemUtil {
                     WatchEvent<Path> ev = (WatchEvent<Path>) event;
                     Path filename = ev.context();
 
-                    Path child = dir.resolve(filename);
-                    FileProcessor.process(child, processedFolder);
+                    Path child = inputDir.resolve(filename);
+                    Files.walkFileTree(child, )
+                    FileProcessor.process(child, outputDir);
                 }
             }
 
@@ -69,7 +70,7 @@ public class FileSystemUtil {
         } catch (IOException x) {
             logger.error(
                     String.format("Could not register watcher for folder %s. Is the folder available?", dir));
-            throw new RuntimeException(x); //TODO wait until folder exists
+            throw new RuntimeException(x);
         }
     }
 }

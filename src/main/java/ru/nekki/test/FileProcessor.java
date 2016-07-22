@@ -21,11 +21,11 @@ public class FileProcessor {
     private final static Logger logger =
             LogManager.getLogger(FileProcessor.class);
 
-    public static void process(Path file, Path processedFolder) {
+    public static void process(Path file, Path outputDir) {
         Entry entry = readFile(file);
         if (entry == null) return;
         DAOService.save(entry);
-        moveFile(file, processedFolder);
+        moveFile(file, outputDir);
     }
 
     private static Entry readFile(Path file) {
@@ -41,13 +41,13 @@ public class FileProcessor {
         return entry;
     }
 
-    private static void moveFile(Path file, Path processedFolder) {
+    private static void moveFile(Path file, Path outputDir) {
         try {
-            Path resultPath = Files.move(file, processedFolder.resolve(generateFileName(file)),
+            Path resultPath = Files.move(file, outputDir.resolve(generateFileName(file)),
                     StandardCopyOption.ATOMIC_MOVE);
             logger.info(String.format("%s has been successfully processed and moved to %s", file, resultPath));
         } catch (IOException e) {
-            logger.error(String.format("Error while moving %s to %s", file, processedFolder), e);
+            logger.error(String.format("Error while moving %s to %s", file, outputDir), e);
             //TODO clear DB entry?
         }
     }
