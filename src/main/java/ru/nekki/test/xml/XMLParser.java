@@ -44,7 +44,7 @@ public class XMLParser {
         Document doc = dBuilder.parse(file.toFile());
 
         if (!ENTRY.equals(doc.getDocumentElement().getTagName())) {
-            logger.info(file + " has wrong xml structure");
+            logger.debug(file + " has wrong xml structure");
             return null;
         }
 

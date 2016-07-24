@@ -6,9 +6,18 @@
 <hibernate-mapping>
     <class name="ru.nekki.test.dao.Entry" table="ENTRY">
         <id name="id" type="int" column="ID">
-            <generator class="native"/>
+            <generator class="sequence">
+                <param name="sequence_name">entry_id_seq</param>
+            </generator>
         </id>
         <property name="content" column="CONTENT" type="string"/>
         <property name="creationDate" column="CREATION_DATE" type="java.util.Date"/>
+        <property name="status" column="STATUS">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.nekki.test.dao.STATUS</param>
+                <param name="useNamed">true</param>
+            </type>
+        </property>
+        <property name="path" column="PATH" type="string"/>
     </class>
 </hibernate-mapping>

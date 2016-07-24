@@ -1,6 +1,16 @@
-CREATE TABLE public.ENTRY
+-- Table: entry
+
+-- DROP TABLE entry;
+
+CREATE TABLE entry
 (
-    ID SERIAL PRIMARY KEY NOT NULL,
-    CONTENT VARCHAR(1024),
-    CREATION_DATE DATE
+  id serial NOT NULL,
+  content character varying(1024),
+  creation_date date,
+  status character varying(1024),
+  path character varying(1024),
+  CONSTRAINT entry_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
 );

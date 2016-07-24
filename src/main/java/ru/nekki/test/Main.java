@@ -1,5 +1,6 @@
 package ru.nekki.test;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,8 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by AnVIgnatev on 20.07.2016.
@@ -48,10 +47,17 @@ public class Main {
                 throw new RuntimeException();
             }
         }
+        logger.debug(Arrays.toString(dirs) + " are checked OK");
     }
 
     private static void processNewFiles(final Path inputDir, final Path outputDir) {
-        FileSystemUtil.waitForNewFilesAndProcess(inputDir, outputDir);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                FileSystemUtil.waitForNewFilesAndProcess(inputDir, outputDir);
+            }
+        }).start();
+        logger.printf(Level.DEBUG, "Monitoring %s for new files", inputDir);
     }
 
     private static void processInitialFiles(Path inputDir, Path outputDir) {

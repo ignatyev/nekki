@@ -4,9 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.metamodel.MetadataSources;
 
 public class DAOService {
     private final static Logger logger =
@@ -27,7 +27,7 @@ public class DAOService {
             sessionFactory =
                     new MetadataSources(registry).buildMetadata().buildSessionFactory();
         } catch (Exception e) {
-            logger.error("DB is not available", e);
+            logger.error(e);
             // The registry would be destroyed by the SessionFactory, but we had trouble building the SessionFactory
             // so destroy it manually.
             StandardServiceRegistryBuilder.destroy(registry);
@@ -36,9 +36,10 @@ public class DAOService {
     }
 
     public static void save(Entry entry) {
-        Session session = sessionFactory.openSession();
-        session.save(entry);
+        Session session = sessionFactory.openSession();  //TODO open created session?
+        session.saveOrUpdate(entry);
         session.flush();
         session.close();
     }
+
 }

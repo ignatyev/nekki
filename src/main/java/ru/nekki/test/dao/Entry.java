@@ -1,23 +1,20 @@
 package ru.nekki.test.dao;
 
 
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.util.Date;
 
-@javax.persistence.Entity
-@Table(name = "ENTRY")
 public class Entry {
+    private Integer id;
     private String content;
     private Date creationDate;
-    private int id;
+    private STATUS status;
+    private String path;
 
-    @Id
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -35,5 +32,21 @@ public class Entry {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public STATUS getStatus() {
+        return status;
+    }
+
+    public void setStatus(STATUS status) {
+        this.status = status;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getPath() {
+        return path;
     }
 }

@@ -18,6 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static ru.nekki.test.dao.STATUS.STARTED;
+import static ru.nekki.test.dao.STATUS.SUCCESSFUL;
+
 /**
  * Created by AnVIgnatev on 20.07.2016.
  */
@@ -27,12 +30,11 @@ class FileProcessor {
     private final static ExecutorService threadPool =
             Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     //only used as a lock so that one file is processed exactly once
-    private final static ConcurrentHashMap<String, Boolean> processingQueue = new ConcurrentHashMap<>();
+    private final static ConcurrentHashMap<String, Boolean> filesInProcess = new ConcurrentHashMap<>();
 
     static void process(Path file, Path outputDir) throws IOException {
         String canonicalPath = file.toFile().getCanonicalPath();
-        //FIXME non atomic
-        if (processingQueue.putIfAbsent(canonicalPath, Boolean.TRUE)) {
+        if (filesInProcess.putIfAbsent(canonicalPath, Boolean.TRUE) == null) {
             threadPool.submit(new ProcessFileCallable(file, outputDir));
         }
     }
@@ -41,6 +43,9 @@ class FileProcessor {
         Entry entry = null;
         try {
             entry = XMLParser.parse(file);
+            if (entry != null) {
+                entry.setPath(file.toFile().getCanonicalPath());
+            }
             logger.info(file + " has been successfully parsed.");
         } catch (IOException | ParserConfigurationException e) {
             logger.error("Error while reading/parsing " + file, e);
@@ -50,15 +55,10 @@ class FileProcessor {
         return entry;
     }
 
-    private static void moveFile(Path file, Path outputDir) {
-        try {
-            Path resultPath = Files.move(file, outputDir.resolve(generateFileName(file)),
-                    StandardCopyOption.ATOMIC_MOVE);
-            logger.info(String.format("%s has been successfully processed and moved to %s", file, resultPath));
-        } catch (IOException e) {
-            logger.error(String.format("Error while moving %s to %s", file, outputDir), e);
-            //TODO clear DB entry?
-        }
+    private static void moveFile(Path file, Path outputDir) throws IOException {
+        Path resultPath = Files.move(file, outputDir.resolve(generateFileName(file)),
+                StandardCopyOption.ATOMIC_MOVE);
+        logger.info(String.format("%s has been successfully processed and moved to %s", file, resultPath));
     }
 
     private static String generateFileName(Path file) {
@@ -78,14 +78,16 @@ class FileProcessor {
 
         @Override
         public Object call() throws IOException {
-            //TODO add statuses
             try {
                 Entry entry = readFile(file);
                 if (entry == null) return null;
-                DAOService.save(entry);
+                entry.setStatus(STARTED);
                 moveFile(file, outputDir);
+                DAOService.save(entry);
+                entry.setStatus(SUCCESSFUL);
+                DAOService.save(entry);
             } finally {
-                processingQueue.remove(file.toFile().getCanonicalPath());
+                filesInProcess.remove(file.toFile().getCanonicalPath());
             }
             //returning null here just in order to return something.
             // Callable is used instead of Runnable in order to declare an exception
