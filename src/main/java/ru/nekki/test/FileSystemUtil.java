@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.concurrent.ExecutorService;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
@@ -12,12 +13,12 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 /**
  * Created by AnVIgnatev on 20.07.2016.
  */
-public class FileSystemUtil {
+class FileSystemUtil {
     private final static Logger logger =
             LogManager.getLogger(FileSystemUtil.class);
 
 
-    public static void waitForNewFilesAndProcess(Path inputDir, Path outputDir) {
+    static void waitForNewFilesAndProcess(Path inputDir, Path outputDir) {
         WatchService watcher = registerWatcher(inputDir);
         for (; ; ) {
             WatchKey key;
@@ -45,8 +46,11 @@ public class FileSystemUtil {
                     Path filename = ev.context();
 
                     Path child = inputDir.resolve(filename);
-                    Files.walkFileTree(child, )
-                    FileProcessor.process(child, outputDir);
+                    try {
+                        Files.walkFileTree(child, new FileVisitor(outputDir));
+                    } catch (IOException e) {
+                        logger.error("Error while reading a newly added file " + child, e);
+                    }
                 }
             }
 

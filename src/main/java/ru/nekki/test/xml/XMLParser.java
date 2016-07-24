@@ -29,11 +29,11 @@ import java.util.Date;
  * Created by AnVIgnatev on 20.07.2016.
  */
 public class XMLParser {
-    public static final String CONTENT = "content";
-    public static final String CREATION_DATE = "creationDate";
-    public static final String ENTRY = "Entry";
-    public static final String DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
-    public static final int MAX_CONTENT_LENGTH = 1024;
+    private static final String CONTENT = "content";
+    private static final String CREATION_DATE = "creationDate";
+    private static final String ENTRY = "Entry";
+    private static final String DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
+    private static final int MAX_CONTENT_LENGTH = 1024;
     private final static Logger logger =
             LogManager.getLogger(XMLParser.class);
 

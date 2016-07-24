@@ -17,8 +17,6 @@ import java.util.concurrent.Executors;
 public class Main {
 
     private final static Logger logger = LogManager.getLogger(Main.class);
-    private final static ExecutorService threadPool =
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static void main(String[] args) {
         logger.debug("=================================START=================================\n");
@@ -51,21 +49,14 @@ public class Main {
             }
         }
     }
-    public static void processNewFiles(final Path inputDir, final Path outputDir) {
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        FileSystemUtil.waitForNewFilesAndProcess(inputDir, outputDir);
-                    }
-                }
-        ).start();
 
+    private static void processNewFiles(final Path inputDir, final Path outputDir) {
+        FileSystemUtil.waitForNewFilesAndProcess(inputDir, outputDir);
     }
 
     private static void processInitialFiles(Path inputDir, Path outputDir) {
         try {
-            Files.walkFileTree(inputDir, new FileVisitor(outputDir, threadPool));
+            Files.walkFileTree(inputDir, new FileVisitor(outputDir));
         } catch (IOException e) {
             logger.error("An error while walking through " + inputDir, e);
         }
