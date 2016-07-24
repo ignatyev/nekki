@@ -31,6 +31,7 @@ class FileProcessor {
 
     static void process(Path file, Path outputDir) throws IOException {
         String canonicalPath = file.toFile().getCanonicalPath();
+        //FIXME non atomic
         if (processingQueue.putIfAbsent(canonicalPath, Boolean.TRUE)) {
             threadPool.submit(new ProcessFileCallable(file, outputDir));
         }
