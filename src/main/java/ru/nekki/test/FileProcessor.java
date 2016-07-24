@@ -26,6 +26,7 @@ class FileProcessor {
             LogManager.getLogger(FileProcessor.class);
     private final static ExecutorService threadPool =
             Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    //only used as a lock so that one file is processed exactly once
     private final static ConcurrentHashMap<String, Boolean> processingQueue = new ConcurrentHashMap<>();
 
     static void process(Path file, Path outputDir) throws IOException {
