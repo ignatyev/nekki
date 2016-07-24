@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.concurrent.ExecutorService;
+import java.util.Collections;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
@@ -47,7 +47,10 @@ class FileSystemUtil {
 
                     Path child = inputDir.resolve(filename);
                     try {
-                        Files.walkFileTree(child, new FileVisitor(outputDir));
+                        Files.walkFileTree(child,
+                                Collections.singleton(FileVisitOption.FOLLOW_LINKS),
+                                Integer.MAX_VALUE,
+                                new FileVisitor(outputDir));
                     } catch (IOException e) {
                         logger.error("Error while reading a newly added file " + child, e);
                     }

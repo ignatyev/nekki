@@ -5,10 +5,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Created by AnVIgnatev on 20.07.2016.
@@ -62,7 +64,10 @@ public class Main {
 
     private static void processInitialFiles(Path inputDir, Path outputDir) {
         try {
-            Files.walkFileTree(inputDir, new FileVisitor(outputDir));
+            Files.walkFileTree(inputDir,
+                    Collections.singleton(FileVisitOption.FOLLOW_LINKS),
+                    Integer.MAX_VALUE,
+                    new FileVisitor(outputDir));
         } catch (IOException e) {
             logger.error("An error while walking through " + inputDir, e);
         }

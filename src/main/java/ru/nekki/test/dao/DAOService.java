@@ -34,5 +34,6 @@ public class DAOService {
         session.saveOrUpdate(entry);
         session.flush();
         session.close();
+        logger.debug("saved");
     }
 }
