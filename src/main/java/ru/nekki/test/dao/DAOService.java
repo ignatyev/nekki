@@ -4,9 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.metamodel.MetadataSources;
 
 public class DAOService {
     private final static Logger logger =
@@ -36,10 +36,9 @@ public class DAOService {
     }
 
     public static void save(Entry entry) {
-        Session session = sessionFactory.openSession();  //TODO open created session?
-        session.saveOrUpdate(entry);
-        session.flush();
-        session.close();
+        try (Session session = sessionFactory.openSession()) { //TODO open created session?
+            session.saveOrUpdate(entry);
+            session.flush();
+        }
     }
-
 }
