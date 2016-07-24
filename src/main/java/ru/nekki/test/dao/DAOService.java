@@ -4,9 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.internal.StandardServiceRegistryImpl;
 
 public class DAOService {
     private final static Logger logger =
@@ -19,26 +19,20 @@ public class DAOService {
     }
 
     private static void setUp() {
-        // A SessionFactory is set up once for an application!
-        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-                .configure() // configures settings from hibernate.cfg.xml
-                .build();
         try {
-            sessionFactory =
-                    new MetadataSources(registry).buildMetadata().buildSessionFactory();
-        } catch (Exception e) {
-            logger.error(e);
-            // The registry would be destroyed by the SessionFactory, but we had trouble building the SessionFactory
-            // so destroy it manually.
-            StandardServiceRegistryBuilder.destroy(registry);
-            throw e;
+            // Create the SessionFactory from hibernate.cfg.xml
+            sessionFactory = new Configuration().configure().buildSessionFactory();
+        } catch (Throwable ex) {
+            // Make sure you log the exception, as it might be swallowed
+            logger.error("Initial SessionFactory creation failed.", ex);
+            throw new ExceptionInInitializerError(ex);
         }
     }
 
     public static void save(Entry entry) {
-        try (Session session = sessionFactory.openSession()) { //TODO open created session?
-            session.saveOrUpdate(entry);
-            session.flush();
-        }
+        Session session = sessionFactory.openSession();  //TODO open created session?
+        session.saveOrUpdate(entry);
+        session.flush();
+        session.close();
     }
 }

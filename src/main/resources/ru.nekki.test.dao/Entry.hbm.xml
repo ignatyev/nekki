@@ -7,7 +7,7 @@
     <class name="ru.nekki.test.dao.Entry" table="ENTRY">
         <id name="id" type="int" column="ID">
             <generator class="sequence">
-                <param name="sequence_name">entry_id_seq</param>
+                <param name="sequence">entry_id_seq</param>
             </generator>
         </id>
         <property name="content" column="CONTENT" type="string"/>
