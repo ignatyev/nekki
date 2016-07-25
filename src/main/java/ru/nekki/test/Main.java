@@ -52,7 +52,6 @@ public class Main {
                     logger.error("Could not create folder " + dir, e);
                     throw e;
                 }
-//                throw new RuntimeException();
             }
         }
         logger.debug(Arrays.toString(dirs) + " are checked OK");

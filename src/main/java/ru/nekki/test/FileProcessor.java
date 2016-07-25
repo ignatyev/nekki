@@ -87,8 +87,8 @@ class FileProcessor {
                 Entry entry = readFile(file);
                 if (entry == null) return null;
                 entry.setStatus(STARTED);
-                moveFile(file, outputDir);
                 DAOService.save(entry);
+                moveFile(file, outputDir);
                 entry.setStatus(SUCCESSFUL);
                 DAOService.save(entry);
             } finally {

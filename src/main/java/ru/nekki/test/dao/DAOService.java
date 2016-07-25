@@ -34,12 +34,12 @@ public class DAOService {
     }
 
     public static void save(Entry entry) {
-        Session session = sessionFactory.openSession();  //TODO open created session?
+        Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         session.saveOrUpdate(entry);
         session.flush();
         transaction.commit();
         session.close();
-        logger.debug("saved");
+        logger.debug("Saved entry of id: " + entry.getId());
     }
 }
