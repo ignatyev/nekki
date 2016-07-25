@@ -56,9 +56,14 @@ class FileProcessor {
     }
 
     private static void moveFile(Path file, Path outputDir) throws IOException {
-        Path resultPath = Files.move(file, outputDir.resolve(generateFileName(file)),
-                StandardCopyOption.ATOMIC_MOVE);
-        logger.info(String.format("%s has been successfully processed and moved to %s", file, resultPath));
+        try {
+            Path resultPath = Files.move(file, outputDir.resolve(generateFileName(file)),
+                    StandardCopyOption.ATOMIC_MOVE);
+            logger.info(String.format("%s has been successfully processed and moved to %s", file, resultPath));
+        } catch (IOException e) {
+            logger.error(String.format("Error while moving %s to %s", file, outputDir), e);
+            throw e;
+        }
     }
 
     private static String generateFileName(Path file) {

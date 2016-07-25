@@ -19,7 +19,7 @@ public class Main {
 
     private final static Logger logger = LogManager.getLogger(Main.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         logger.debug("=================================START=================================\n");
         logger.debug(Arrays.toString(args));
         if (args.length != 2) {
@@ -36,17 +36,23 @@ public class Main {
         logger.debug("input folder: " + inputDir);
         Path outputDir = Paths.get(args[1]);
         logger.debug("output folder: " + outputDir);
-        checkFolders(inputDir, outputDir);
+        createFolders(inputDir, outputDir);
         processNewFiles(inputDir, outputDir);
         processInitialFiles(inputDir, outputDir);
     }
 
-    private static void checkFolders(Path... dirs) {
+    private static void createFolders(Path... dirs) throws IOException {
         for (Path dir : dirs) {
             if (Files.notExists(dir) || !Files.isDirectory(dir)) {
                 logger.error(
                         String.format("The folder %s does not exist, is not a directory or is forbidden to be read", dir));
-                throw new RuntimeException();
+                try {
+                    Files.createDirectories(dir);
+                } catch (IOException e) {
+                    logger.error("Could not create folder " + dir, e);
+                    throw e;
+                }
+//                throw new RuntimeException();
             }
         }
         logger.debug(Arrays.toString(dirs) + " are checked OK");
