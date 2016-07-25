@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
@@ -34,8 +35,10 @@ public class DAOService {
 
     public static void save(Entry entry) {
         Session session = sessionFactory.openSession();  //TODO open created session?
+        Transaction transaction = session.beginTransaction();
         session.saveOrUpdate(entry);
         session.flush();
+        transaction.commit();
         session.close();
         logger.debug("saved");
     }
